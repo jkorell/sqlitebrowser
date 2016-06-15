@@ -34,7 +34,7 @@ EditTableDialog::EditTableDialog(DBBrowserDB* db, const QString& tableName, bool
     }
 
     // And create a savepoint
-    pdb->setRestorePoint(m_sRestorePointName);
+    pdb->setSavepoint(m_sRestorePointName);
 
     // Update UI
     ui->editTableName->setText(curTable);
@@ -158,7 +158,7 @@ void EditTableDialog::accept()
 void EditTableDialog::reject()
 {    
     // Then rollback to our savepoint
-    pdb->revert(m_sRestorePointName);
+    pdb->revertToSavepoint(m_sRestorePointName);
     pdb->updateSchema();
 
     QDialog::reject();
@@ -216,6 +216,18 @@ void EditTableDialog::itemChanged(QTreeWidgetItem *item, int column)
         switch(column)
         {
         case kName:
+            // When a field of that name already exists, show a warning to the user and don't apply the new name
+            if(fieldNameExists(item->text(column)))
+            {
+                QMessageBox::warning(this, qApp->applicationName(), tr("There already is a field with that name. Please rename it first or choose a different "
+                                                                       "name for this field."));
+                // Reset the name to the old value but avoid calling this method again for that automatic change
+                ui->treeWidget->blockSignals(true);
+                item->setText(column, oldFieldName);
+                ui->treeWidget->blockSignals(false);
+                return;
+            }
+
             // When editing an exiting table, check if any foreign keys would cause trouble in case this name is edited
             if(!m_bNewTable)
             {
@@ -229,6 +241,10 @@ void EditTableDialog::itemChanged(QTreeWidgetItem *item, int column)
                             {
                                 QMessageBox::warning(this, qApp->applicationName(), tr("This column is referenced in a foreign key in table %1, column %2 and thus "
                                                                                        "its name cannot be changed.").arg(fkobj.getname()).arg(fkfield->name()));
+                                // Reset the name to the old value but avoid calling this method again for that automatic change
+                                ui->treeWidget->blockSignals(true);
+                                item->setText(column, oldFieldName);
+                                ui->treeWidget->blockSignals(false);
                                 return;
                             }
                         }
@@ -419,7 +435,20 @@ void EditTableDialog::addField()
 {
     QTreeWidgetItem *tbitem = new QTreeWidgetItem(ui->treeWidget);
     tbitem->setFlags(tbitem->flags() | Qt::ItemIsEditable);
-    tbitem->setText(kName, "Field" + QString::number(ui->treeWidget->topLevelItemCount()));
+
+    // Find an unused name for the field by starting with 'Fieldx' where x is the number of fields + 1.
+    // If this name happens to exist already, increase x by one until we find an unused name.
+    {
+        unsigned int field_number = ui->treeWidget->topLevelItemCount();
+        QString field_name;
+        do
+        {
+            field_name = "Field" + QString::number(field_number);
+            field_number++;
+        } while(fieldNameExists(field_name));
+        tbitem->setText(kName, field_name);
+    }
+
     QComboBox* typeBox = new QComboBox(ui->treeWidget);
     typeBox->setProperty("column", tbitem->text(kName));
     typeBox->setEditable(true);
@@ -599,4 +628,15 @@ void EditTableDialog::setWithoutRowid(bool without_rowid)
     updateSqlText();
 
     // TODO: Update table if we're editing an existing table
+}
+
+bool EditTableDialog::fieldNameExists(const QString& name)
+{
+    foreach(const sqlb::FieldPtr& ptr, m_table.fields())
+    {
+        if(ptr->name() == name)
+            return true;
+    }
+
+    return false;
 }

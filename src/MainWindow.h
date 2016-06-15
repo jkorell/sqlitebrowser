@@ -103,11 +103,13 @@ private:
     Ui::MainWindow* ui;
 
     SqliteTableModel* m_browseTableModel;
+    SqliteTableModel* m_currentTabTableModel;
     SqliteTableModel* m_currentPlotModel;
     QMenu *popupTableMenu;
     QMenu *recentFilesMenu;
     QMenu *popupSaveSqlFileMenu;
     QMenu* popupBrowseDataHeaderMenu;
+    QMenu* popupRecordMenu;
 
     QLabel* statusEncodingLabel;
     QLabel* statusEncryptionLabel;
@@ -122,6 +124,7 @@ private:
     QMap<QString, BrowseDataTableSettings> browseTableSettings;
 
     EditDialog* editWin;
+    EditDialog* editDock;
     QIntValidator* gotoValidator;
 
     DBBrowserDB db;
@@ -150,17 +153,19 @@ public slots:
     void dbState(bool dirty);
     void browseRefresh();
     void jumpToRow(const QString& table, QString column, const QByteArray& value);
+    void switchToBrowseDataTab(QString tableToBrowse = QString());
 
 private slots:
     void createTreeContextMenu(const QPoint & qPoint);
     void changeTreeSelection();
     void fileNew();
     void populateStructure();
-    void populateTable(const QString& tablename);
-    void resetBrowser();
-    void fileClose();
+    void populateTable(QString tablename);
+    void resetBrowser(bool reloadTable = true);
+    bool fileClose();
     void addRecord();
     void deleteRecord();
+    void dittoRecord();
     void selectTableLine( int lineToSelect );
     void navigatePrevious();
     void navigateNext();
@@ -175,9 +180,9 @@ private slots:
     void editTable();
     void helpWhatsThis();
     void helpAbout();
-    void updateRecordText(int row, int col, const QByteArray& newtext);
+    void updateRecordText(int row, int col, bool type, const QByteArray& newtext);
     void editWinAway();
-    void editText(const QModelIndex& index);
+    void dataTableSelectionChanged(const QModelIndex& index);
     void doubleClickTable(const QModelIndex& index);
     void executeQuery();
     void importTableFromCSV();
@@ -214,16 +219,17 @@ private slots:
     void fileAttach();
     void updateFilter(int column, const QString& value);
     void editEncryption();
-    void switchToBrowseDataTab();
     void on_buttonClearFilters_clicked();
     void copyCurrentCreateStatement();
     void on_comboLineType_currentIndexChanged(int index);
     void on_comboPointShape_currentIndexChanged(int index);
     void showDataColumnPopupMenu(const QPoint& pos);
+    void showRecordPopupMenu(const QPoint& pos);
     void editDataColumnDisplayFormat();
     void showRowidColumn(bool show);
     void browseDataSetTableEncoding(bool forAllTables = false);
     void browseDataSetDefaultTableEncoding();
+    void browseDataFetchAllData();
 };
 
 #endif

@@ -10,14 +10,17 @@ ColumnDisplayFormatDialog::ColumnDisplayFormatDialog(const QString& colname, QSt
     // Create UI
     ui->setupUi(this);
     ui->comboDisplayFormat->addItem(tr("Default"), "default");
-    ui->comboDisplayFormat->addItem(tr("Lower case"), "lower");
-    ui->comboDisplayFormat->addItem(tr("Upper case"), "upper");
-    ui->comboDisplayFormat->addItem(tr("Unix epoch to date"), "epoch");
-    ui->comboDisplayFormat->addItem(tr("Julian day to date"), "julian");
-    ui->comboDisplayFormat->addItem(tr("Round number"), "round");
-    ui->comboDisplayFormat->addItem(tr("Hex number"), "hex");
-    ui->comboDisplayFormat->addItem(tr("Octal number"), "octal");
+    ui->comboDisplayFormat->addItem(tr("Decimal number"), "decimal");
     ui->comboDisplayFormat->addItem(tr("Exponent notation"), "exponent");
+    ui->comboDisplayFormat->addItem(tr("Hex blob"), "hexblob");
+    ui->comboDisplayFormat->addItem(tr("Hex number"), "hex");
+    ui->comboDisplayFormat->addItem(tr("Julian day to date"), "julian");
+    ui->comboDisplayFormat->addItem(tr("Lower case"), "lower");
+    ui->comboDisplayFormat->addItem(tr("Octal number"), "octal");
+    ui->comboDisplayFormat->addItem(tr("Round number"), "round");
+    ui->comboDisplayFormat->addItem(tr("Unix epoch to date"), "epoch");
+    ui->comboDisplayFormat->addItem(tr("Upper case"), "upper");
+    ui->comboDisplayFormat->addItem(tr("Windows DATE to date"), "winDate");
     ui->labelDisplayFormat->setText(ui->labelDisplayFormat->text().arg(column_name));
 
     // Set the current format, if it's empty set the default format
@@ -64,14 +67,20 @@ void ColumnDisplayFormatDialog::updateSqlCode()
         ui->editDisplayFormat->setText("upper(" + sqlb::escapeIdentifier(column_name) + ")");
     else if(format == "epoch")
         ui->editDisplayFormat->setText("datetime(" + sqlb::escapeIdentifier(column_name) + ", 'unixepoch')");
+    else if(format == "winDate")
+        ui->editDisplayFormat->setText("datetime ('1899-12-30', " + sqlb::escapeIdentifier(column_name) + " || \" days\" )");
     else if(format == "julian")
         ui->editDisplayFormat->setText("datetime(" + sqlb::escapeIdentifier(column_name) + ")");
     else if(format == "round")
         ui->editDisplayFormat->setText("round(" + sqlb::escapeIdentifier(column_name) + ")");
     else if(format == "hex")
-        ui->editDisplayFormat->setText("printf('%x', " + sqlb::escapeIdentifier(column_name) + ")");
+        ui->editDisplayFormat->setText("printf('0x%x', " + sqlb::escapeIdentifier(column_name) + ")");
     else if(format == "octal")
         ui->editDisplayFormat->setText("printf('%o', " + sqlb::escapeIdentifier(column_name) + ")");
     else if(format == "exponent")
         ui->editDisplayFormat->setText("printf('%e', " + sqlb::escapeIdentifier(column_name) + ")");
+    else if(format == "hexblob")
+        ui->editDisplayFormat->setText("hex(" + sqlb::escapeIdentifier(column_name) + ")");
+    else if(format == "decimal")
+        ui->editDisplayFormat->setText("printf('%d', " + sqlb::escapeIdentifier(column_name) + ")");
 }

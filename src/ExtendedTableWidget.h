@@ -4,6 +4,8 @@
 #include <QTableView>
 #include "FilterTableHeader.h"
 #include <QSet>
+#include <QDropEvent>
+#include <QDragMoveEvent>
 
 class ExtendedTableWidget : public QTableView
 {
@@ -22,6 +24,7 @@ signals:
 
 private:
     void copy();
+    void paste();
     int numVisibleRows();
 
 private slots:
@@ -31,6 +34,9 @@ private slots:
 protected:
     virtual void keyPressEvent(QKeyEvent* event);
     virtual void updateGeometries();
+    virtual void dragEnterEvent(QDragEnterEvent* event);
+    virtual void dragMoveEvent(QDragMoveEvent* event);
+    virtual void dropEvent(QDropEvent* event);
 
     FilterTableHeader* m_tableHeader;
 };

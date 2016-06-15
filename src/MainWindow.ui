@@ -182,11 +182,20 @@
         </item>
         <item>
          <widget class="ExtendedTableWidget" name="dataTable">
+          <property name="acceptDrops">
+           <bool>true</bool>
+          </property>
           <property name="whatsThis">
            <string>This is the database view. You can double-click any record to edit its contents in the cell editor window.</string>
           </property>
           <property name="editTriggers">
            <set>QAbstractItemView::NoEditTriggers</set>
+          </property>
+          <property name="dragDropMode">
+           <enum>QAbstractItemView::DragDrop</enum>
+          </property>
+          <property name="defaultDropAction">
+           <enum>Qt::CopyAction</enum>
           </property>
           <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
            <bool>true</bool>
@@ -324,7 +333,7 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>506</width>
+             <width>468</width>
              <height>558</height>
             </rect>
            </property>
@@ -1246,6 +1255,17 @@
           </property>
          </widget>
         </item>
+        <item>
+         <widget class="QToolButton" name="buttonLoadAllData">
+          <property name="toolTip">
+           <string>Load all data. This has only an effect if not all data has been fetched from the table yet due to the partial fetch mechanism.</string>
+          </property>
+          <property name="icon">
+           <iconset resource="icons/icons.qrc">
+            <normaloff>:/icons/keyword</normaloff>:/icons/keyword</iconset>
+          </property>
+         </widget>
+        </item>
        </layout>
       </widget>
      </item>
@@ -1276,6 +1296,15 @@
      </item>
     </layout>
    </widget>
+  </widget>
+  <widget class="QDockWidget" name="dockEditWindow">
+   <property name="windowTitle">
+    <string>Edit &amp;cell</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>8</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents_4"/>
   </widget>
   <action name="fileNewAction">
    <property name="icon">
@@ -1795,6 +1824,14 @@
     <string>Change the default encoding assumed for all tables in the database</string>
    </property>
   </action>
+  <action name="actionDittoRecord">
+   <property name="text">
+    <string>Duplicate record</string>
+   </property>
+   <property name="toolTip">
+    <string>Duplicate record</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
@@ -1849,6 +1886,16 @@
   <tabstop>spinPragmaWalAutoCheckpoint</tabstop>
   <tabstop>comboLogSubmittedBy</tabstop>
   <tabstop>buttonLogClear</tabstop>
+  <tabstop>mainTab</tabstop>
+  <tabstop>buttonBegin</tabstop>
+  <tabstop>buttonEnd</tabstop>
+  <tabstop>tabSqlAreas</tabstop>
+  <tabstop>treePlotColumns</tabstop>
+  <tabstop>comboLineType</tabstop>
+  <tabstop>comboPointShape</tabstop>
+  <tabstop>butSavePlot</tabstop>
+  <tabstop>buttonLoadAllData</tabstop>
+  <tabstop>treeSchemaDock</tabstop>
  </tabstops>
  <resources>
   <include location="icons/icons.qrc"/>
@@ -1941,8 +1988,8 @@
    <slot>addRecord()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>443</x>
-     <y>141</y>
+     <x>402</x>
+     <y>143</y>
     </hint>
     <hint type="destinationlabel">
      <x>399</x>
@@ -1957,8 +2004,8 @@
    <slot>deleteRecord()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>565</x>
-     <y>141</y>
+     <x>506</x>
+     <y>143</y>
     </hint>
     <hint type="destinationlabel">
      <x>399</x>
@@ -1973,8 +2020,8 @@
    <slot>navigatePrevious()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>74</x>
-     <y>585</y>
+     <x>86</x>
+     <y>539</y>
     </hint>
     <hint type="destinationlabel">
      <x>399</x>
@@ -1989,8 +2036,8 @@
    <slot>navigateNext()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>168</x>
-     <y>585</y>
+     <x>183</x>
+     <y>539</y>
     </hint>
     <hint type="destinationlabel">
      <x>399</x>
@@ -2005,8 +2052,8 @@
    <slot>navigateGoto()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>413</x>
-     <y>586</y>
+     <x>365</x>
+     <y>539</y>
     </hint>
     <hint type="destinationlabel">
      <x>399</x>
@@ -2021,8 +2068,8 @@
    <slot>navigateGoto()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>565</x>
-     <y>586</y>
+     <x>506</x>
+     <y>538</y>
     </hint>
     <hint type="destinationlabel">
      <x>399</x>
@@ -2277,8 +2324,8 @@
    <slot>createTreeContextMenu(QPoint)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>101</x>
-     <y>125</y>
+     <x>111</x>
+     <y>261</y>
     </hint>
     <hint type="destinationlabel">
      <x>399</x>
@@ -2325,8 +2372,8 @@
    <slot>loadPragmas()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>101</x>
-     <y>125</y>
+     <x>111</x>
+     <y>540</y>
     </hint>
     <hint type="destinationlabel">
      <x>-1</x>
@@ -2341,8 +2388,8 @@
    <slot>savePragmas()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>101</x>
-     <y>125</y>
+     <x>111</x>
+     <y>540</y>
     </hint>
     <hint type="destinationlabel">
      <x>802</x>
@@ -2361,8 +2408,8 @@
      <y>126</y>
     </hint>
     <hint type="destinationlabel">
-     <x>691</x>
-     <y>163</y>
+     <x>632</x>
+     <y>173</y>
     </hint>
    </hints>
   </connection>
@@ -2377,8 +2424,8 @@
      <y>126</y>
     </hint>
     <hint type="destinationlabel">
-     <x>990</x>
-     <y>240</y>
+     <x>1028</x>
+     <y>230</y>
     </hint>
    </hints>
   </connection>
@@ -2389,12 +2436,12 @@
    <slot>setCurrentIndex(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>872</x>
-     <y>126</y>
+     <x>772</x>
+     <y>135</y>
     </hint>
     <hint type="destinationlabel">
-     <x>987</x>
-     <y>240</y>
+     <x>1028</x>
+     <y>230</y>
     </hint>
    </hints>
   </connection>
@@ -2421,8 +2468,8 @@
    <slot>closeSqlTab(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>81</x>
-     <y>125</y>
+     <x>91</x>
+     <y>259</y>
     </hint>
     <hint type="destinationlabel">
      <x>-1</x>
@@ -2645,8 +2692,8 @@
    <slot>navigateEnd()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>189</x>
-     <y>573</y>
+     <x>223</x>
+     <y>539</y>
     </hint>
     <hint type="destinationlabel">
      <x>499</x>
@@ -2661,8 +2708,8 @@
    <slot>navigateBegin()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>69</x>
-     <y>140</y>
+     <x>50</x>
+     <y>539</y>
     </hint>
     <hint type="destinationlabel">
      <x>499</x>
@@ -2709,8 +2756,8 @@
    <slot>jumpToRow(QString,QString,QByteArray)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>60</x>
-     <y>105</y>
+     <x>70</x>
+     <y>242</y>
     </hint>
     <hint type="destinationlabel">
      <x>518</x>
@@ -2782,6 +2829,38 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>buttonLoadAllData</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>browseDataFetchAllData()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1003</x>
+     <y>389</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1005</x>
+     <y>412</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionDittoRecord</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>dittoRecord()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>518</x>
+     <y>314</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>fileOpen()</slot>
@@ -2842,5 +2921,7 @@
   <slot>showRowidColumn(bool)</slot>
   <slot>browseDataSetTableEncoding()</slot>
   <slot>browseDataSetDefaultTableEncoding()</slot>
+  <slot>browseDataFetchAllData()</slot>
+  <slot>dittoRecord()</slot>
  </slots>
 </ui>

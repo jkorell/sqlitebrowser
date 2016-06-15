@@ -12,12 +12,12 @@ endif()
 
 if(WIN32 AND MSVC)
 	if(CMAKE_CL_64)
-		set(QT5_PATH "E:/Qt64/Qt5.4.1/5.4/msvc2013_64")
-		set(SQLITE3_PATH "E:/libs/sqlite3_x64")
-		set(OPENSSL_PATH "E:/libs/openssl-1.0.2a-x64_86-win64")
+		set(SQLITE3_PATH "C:/dev/SQLite")
+		set(QT5_PATH "C:/dev/Qt/5.6/msvc2013_64")
+		set(OPENSSL_PATH "C:/dev/OpenSSL-Win64")
 		set(VSREDIST "vcredist_x64.exe")
 	else()
-		set(QT5_PATH "E:/Qt/Qt5.4.1/5.4/msvc2013")
+		set(QT5_PATH "E:/Qt/Qt5.5.1/5.5/msvc2013")
 		set(SQLITE3_PATH "E:/libs/sqlite3")
 		set(OPENSSL_PATH "E:/libs/openssl-1.0.2a-i386-win32")
 		set(VSREDIST "vcredist_x86.exe")
@@ -88,6 +88,7 @@ set(SQLB_MOC_HDR
 	src/SqlUiLexer.h
 	src/FileDialog.h
 	src/ColumnDisplayFormatDialog.h
+	src/FilterLineEdit.h
 )
 
 set(SQLB_SRC
@@ -118,6 +119,7 @@ set(SQLB_SRC
 	src/SqlUiLexer.cpp
 	src/FileDialog.cpp
 	src/ColumnDisplayFormatDialog.cpp
+	src/FilterLineEdit.cpp
 )
 
 set(SQLB_FORMS
@@ -149,11 +151,15 @@ set(SQLB_MISC
 # Translation files
 set(SQLB_TSS
 	"${CMAKE_SOURCE_DIR}/src/translations/sqlb_zh.ts"
+	"${CMAKE_SOURCE_DIR}/src/translations/sqlb_zh_TW.ts"
 	"${CMAKE_SOURCE_DIR}/src/translations/sqlb_de.ts"
+	"${CMAKE_SOURCE_DIR}/src/translations/sqlb_es_ES.ts"
 	"${CMAKE_SOURCE_DIR}/src/translations/sqlb_fr.ts"
 	"${CMAKE_SOURCE_DIR}/src/translations/sqlb_ru.ts"
 	"${CMAKE_SOURCE_DIR}/src/translations/sqlb_pt_BR.ts"
 	"${CMAKE_SOURCE_DIR}/src/translations/sqlb_en_GB.ts"
+	"${CMAKE_SOURCE_DIR}/src/translations/sqlb_ko_KR.ts"
+	"${CMAKE_SOURCE_DIR}/src/translations/sqlb_tr.ts"
 )
 
 if(USE_QT5)
@@ -192,7 +198,7 @@ if(WIN32)
 		set(SQLB_SRC ${SQLB_SRC} "${CMAKE_CURRENT_BINARY_DIR}/sqlbicon.o")
 		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-subsystem,windows")
 		set(WIN32_STATIC_LINK -Wl,-Bstatic -lssl -lcrypto -lws2_32)
-		set(ADDITIONAL_LIBS lcms lzma)
+		set(ADDITIONAL_LIBS lzma)
 	ELSE( MINGW )
 		set(SQLB_SRC ${SQLB_SRC} "${CMAKE_CURRENT_SOURCE_DIR}/src/winapp.rc")
 	ENDIF( MINGW )
@@ -311,15 +317,29 @@ endif(UNIX AND NOT APPLE)
 
 if(WIN32 AND MSVC)
 	set(QT5_BIN_PATH ${QT5_PATH}/bin)
+	# The Qt5 Debug configuration library files have a 'd' postfix
+	install(FILES
+			${QT5_BIN_PATH}/Qt5Cored.dll
+			${QT5_BIN_PATH}/Qt5Guid.dll
+			${QT5_BIN_PATH}/Qt5Networkd.dll
+			${QT5_BIN_PATH}/Qt5PrintSupportd.dll
+			${QT5_BIN_PATH}/Qt5Widgetsd.dll
+		DESTINATION bin
+		CONFIGURATIONS Debug)
+	# The Qt5 Release configuration files don't have a postfix
 	install(FILES
 			${QT5_BIN_PATH}/Qt5Core.dll
 			${QT5_BIN_PATH}/Qt5Gui.dll
 			${QT5_BIN_PATH}/Qt5Network.dll
 			${QT5_BIN_PATH}/Qt5PrintSupport.dll
 			${QT5_BIN_PATH}/Qt5Widgets.dll
-			${QT5_BIN_PATH}/icudt53.dll
-			${QT5_BIN_PATH}/icuin53.dll
-			${QT5_BIN_PATH}/icuuc53.dll
+		DESTINATION bin
+		CONFIGURATIONS Release)
+	# The files below are common to all configurations
+	install(FILES
+			${QT5_BIN_PATH}/icudt54.dll
+			${QT5_BIN_PATH}/icuin54.dll
+			${QT5_BIN_PATH}/icuuc54.dll
 			${SQLITE3_DLL}
 			${OPENSSL_PATH}/libeay32.dll
 			${OPENSSL_PATH}/ssleay32.dll
@@ -327,7 +347,6 @@ if(WIN32 AND MSVC)
 	install(FILES
 		${QT5_PATH}/plugins/platforms/qwindows.dll
 		DESTINATION bin/platforms)
-
 	install(PROGRAMS ${CMAKE_CURRENT_SOURCE_DIR}/deps/${VSREDIST} DESTINATION tmp)
 endif()
 
@@ -337,8 +356,8 @@ set(CPACK_PACKAGE_VENDOR "oldsch00l")
 set(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
 set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
 set(CPACK_PACKAGE_VERSION_MAJOR "3")
-set(CPACK_PACKAGE_VERSION_MINOR "7")
-set(CPACK_PACKAGE_VERSION_PATCH "99")
+set(CPACK_PACKAGE_VERSION_MINOR "8")
+set(CPACK_PACKAGE_VERSION_PATCH "0")
 set(CPACK_PACKAGE_INSTALL_DIRECTORY "SqliteBrowser${CPACK_PACKAGE_VERSION_MAJOR}")
 if(WIN32 AND NOT UNIX)
 	# There is a bug in NSI that does not handle full unix paths properly. Make

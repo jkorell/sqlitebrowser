@@ -17,6 +17,8 @@ PreferencesDialog::PreferencesDialog(QWidget* parent)
 {
     ui->setupUi(this);
     ui->treeSyntaxHighlighting->setColumnHidden(0, true);
+    ui->labelDatabaseDefaultSqlText->setVisible(false);
+    ui->editDatabaseDefaultSqlText->setVisible(false);
 
     ui->fr_bin_bg->installEventFilter(this);
     ui->fr_bin_fg->installEventFilter(this);
@@ -61,6 +63,7 @@ void PreferencesDialog::loadSettings()
     ui->checkHideSchemaLinebreaks->setChecked(getSettingsValue("db", "hideschemalinebreaks").toBool());
     ui->foreignKeysCheckBox->setChecked(getSettingsValue("db", "foreignkeys").toBool());
     ui->spinPrefetchSize->setValue(getSettingsValue("db", "prefetchsize").toInt());
+    ui->editDatabaseDefaultSqlText->setText(getSettingsValue("db", "defaultsqltext").toString());
 
     ui->comboDataBrowserFont->setCurrentIndex(ui->comboEditorFont->findText(getSettingsValue("databrowser", "font").toString()));
     ui->spinDataBrowserFontSize->setValue(getSettingsValue("databrowser", "fontsize").toInt());
@@ -72,6 +75,8 @@ void PreferencesDialog::loadSettings()
     loadColorSetting(ui->fr_bin_bg, "bin_bg");
 
     ui->txtNull->setText(getSettingsValue("databrowser", "null_text").toString());
+    ui->editFilterEscape->setText(getSettingsValue("databrowser", "filter_escape").toString());
+    ui->spinFilterDelay->setValue(getSettingsValue("databrowser", "filter_delay").toInt());
 
     for(int i=0; i < ui->treeSyntaxHighlighting->topLevelItemCount(); ++i)
     {
@@ -91,6 +96,7 @@ void PreferencesDialog::loadSettings()
     ui->spinEditorFontSize->setValue(getSettingsValue("editor", "fontsize").toInt());
     ui->spinTabSize->setValue(getSettingsValue("editor", "tabsize").toInt());
     ui->spinLogFontSize->setValue(getSettingsValue("log", "fontsize").toInt());
+    ui->checkAutoCompletion->setChecked(getSettingsValue("editor", "auto_completion").toBool());
     ui->checkErrorIndicators->setChecked(getSettingsValue("editor", "error_indicators").toBool());
     ui->checkHorizontalTiling->setChecked(getSettingsValue("editor", "horizontal_tiling").toBool());
 
@@ -107,6 +113,7 @@ void PreferencesDialog::saveSettings()
     setSettingsValue("db", "hideschemalinebreaks", ui->checkHideSchemaLinebreaks->isChecked());
     setSettingsValue("db", "foreignkeys", ui->foreignKeysCheckBox->isChecked());
     setSettingsValue("db", "prefetchsize", ui->spinPrefetchSize->value());
+    setSettingsValue("db", "defaultsqltext", ui->editDatabaseDefaultSqlText->text());
 
     setSettingsValue("checkversion", "enabled", ui->checkUpdates->isChecked());
 
@@ -119,6 +126,8 @@ void PreferencesDialog::saveSettings()
     saveColorSetting(ui->fr_bin_fg, "bin_fg");
     saveColorSetting(ui->fr_bin_bg, "bin_bg");
     setSettingsValue("databrowser", "null_text", ui->txtNull->text());
+    setSettingsValue("databrowser", "filter_escape", ui->editFilterEscape->text());
+    setSettingsValue("databrowser", "filter_delay", ui->spinFilterDelay->value());
 
     for(int i=0; i < ui->treeSyntaxHighlighting->topLevelItemCount(); ++i)
     {
@@ -132,6 +141,7 @@ void PreferencesDialog::saveSettings()
     setSettingsValue("editor", "fontsize", ui->spinEditorFontSize->value());
     setSettingsValue("editor", "tabsize", ui->spinTabSize->value());
     setSettingsValue("log", "fontsize", ui->spinLogFontSize->value());
+    setSettingsValue("editor", "auto_completion", ui->checkAutoCompletion->isChecked());
     setSettingsValue("editor", "error_indicators", ui->checkErrorIndicators->isChecked());
     setSettingsValue("editor", "horizontal_tiling", ui->checkHorizontalTiling->isChecked());
 
@@ -217,6 +227,22 @@ QVariant PreferencesDialog::getSettingsDefaultValue(const QString& group, const 
     if(group == "db" && name == "prefetchsize")
         return 50000;
 
+    // db/defaultsqltext?
+    if(group == "db" && name == "defaultsqltext")
+        return "";
+
+    // exportcsv/firstrowheader?
+    if(group == "exportcsv" && name == "firstrowheader")
+        return true;
+
+    // exportcsv/separator?
+    if(group == "exportcsv" && name == "separator")
+        return ',';
+
+    // exportcsv/quotecharacter?
+    if(group == "exportcsv" && name == "quotecharacter")
+        return '"';
+
     // MainWindow/geometry?
     if(group == "MainWindow" && name == "geometry")
         return "";
@@ -248,19 +274,23 @@ QVariant PreferencesDialog::getSettingsDefaultValue(const QString& group, const 
             return "Sans Serif";
         if(name == "fontsize")
             return 10;
-        if (name == "null_text")
+        if(name == "null_text")
             return "NULL";
-        if (name == "null_fg_colour")
+        if(name == "filter_escape")
+            return "\\";
+        if(name == "filter_delay")
+            return 200;
+        if(name == "null_fg_colour")
             return QColor(Qt::lightGray).name();
-        if (name == "null_bg_colour")
+        if(name == "null_bg_colour")
             return QColor(Qt::white).name();
-        if (name == "reg_fg_colour")
+        if(name == "reg_fg_colour")
             return QColor(Qt::black).name();
-        if (name == "reg_bg_colour")
+        if(name == "reg_bg_colour")
             return QColor(Qt::white).name();
-        if (name == "bin_fg_colour")
+        if(name == "bin_fg_colour")
             return QColor(Qt::lightGray).name();
-        if (name == "bin_bg_colour")
+        if(name == "bin_bg_colour")
             return QColor(Qt::white).name();
     }
 
@@ -314,6 +344,10 @@ QVariant PreferencesDialog::getSettingsDefaultValue(const QString& group, const 
             return 4;
         }
     }
+
+    // editor/auto_completion?
+    if(group == "editor" && name == "auto_completion")
+        return true;
 
     // editor/error_indicators?
     if(group == "editor" && name == "error_indicators")
